@@ -49,15 +49,7 @@ void Engine::input()
 
 				//Pass the position of the mouse click into the constructor
 				Particle particle(m_Window, numPoints, Mouse::getPosition());
-        		m_particles.push_back(particle);
-				/*
-				int numPoints = rand() % (50 - 25 + 1) + 25;
-				Vector2i temp;
-				temp.x = event.mouseButton.x;
-				temp.y = event.mouseButton.y;
-				Particle P(m_Window, numPoints, temp);
-				m_particles.push_back(P);
-				*/
+        			m_particles.push_back(particle);
 			}
 		}
 	}
