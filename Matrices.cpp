@@ -80,6 +80,7 @@ namespace Matrices
 				}
 			}
 		}
+		return true;
 
 	}
 
@@ -95,6 +96,7 @@ namespace Matrices
 				}
 			}
 		}
+		return false;
 	}
 
 	RotationMatrix::RotationMatrix(double theta) : Matrix(2, 2)
