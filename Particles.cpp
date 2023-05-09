@@ -144,33 +144,36 @@ void Particle::unitTests()
 Particle::Particle(RenderTarget& target, int numPoints, Vector2i mouseClickPosition) : m_A(2, numPoints)
 {
 	m_ttl = TTL; //TTL: global variable declared to 5
-	m_numPoints = numPoints;
+	m_numPoints = numPoints; // Initialize m_numPoints to numPoints
 
-	m_radiansPerSec = ((float)rand() / (RAND_MAX)) * PI;
+	m_radiansPerSec = ((float)rand() / (RAND_MAX)) * PI; //assign to a random angular velocity in the range [0:PI]
 
 	m_cartesianPlane.setCenter(0, 0);
+	//initialize size to the RenderWindow stored in target and invert the y-axis
 	m_cartesianPlane.setSize(target.getSize().x, (-1.0) * target.getSize().y);
 	//Use mapPixelToCoords with m_cartesianPlane to map 
     //mouseClickPosition to the Cartesian plane and store it in m_centerCoordinate
 	m_centerCoordinate = target.mapPixelToCoords(mouseClickPosition, m_cartesianPlane);
 
 	m_vx = rand() % (500 - 100 + 1) + 100;	// Assign m_vx and m_vy to random pixel velocities
-	m_vy = rand() % (500 - 100 + 1) + 100;
+	m_vy = rand() % (500 - 100 + 1) + 100;	// range: 100 - 500
 
 	m_color1 = Color::White;
 	m_color2 = ( Color(rand() % 255, rand() % 255, rand() % 255) );
 
+	//make numPoint vertices by sweeping a circular arc with random radii.
 	float temp = (float)rand() / (RAND_MAX);
 	temp = temp * (PI / 2);
-	float theta = temp;
-	float dTheta = ( (2 * PI) / (numPoints - 1) );
+	float theta = temp;						//theta = an angle between [0: PI/ 2]
+	float dTheta = ( (2 * PI) / (numPoints - 1) ); //"- 1" so the last vertex overlaps with the first
 
 	for (int j = 0; j < numPoints; j++)
 	{
-		float r = rand() % (80 - 20 - 1) + 20;
-		float dx = ( r * cos(theta) );
+		float r = rand() % (80 - 20 - 1) + 20; // radius range = [20:80]
+		float dx = ( r * cos(theta) );		//using trig to determine length of x and y components
 		float dy = ( r * sin(theta) );
-		theta += dTheta;
+		theta += dTheta;					//move it to the next location by incrementing
+		//Assign the Cartesian position of the newly generated vertex to m_A
 		m_A(0, j) = m_centerCoordinate.x + dx;
 		m_A(1, j) = m_centerCoordinate.y + dy;
 	}
@@ -178,7 +181,7 @@ Particle::Particle(RenderTarget& target, int numPoints, Vector2i mouseClickPosit
 
 void Particle::draw(RenderTarget& target, RenderStates states) const
 {
-	VertexArray lines(TriangleFan, m_numPoints + 1);
+	VertexArray lines(TriangleFan, m_numPoints + 1); //make a VertexArray named lines
 	Vector2f temp;
 	
 	Vector2f center = (Vector2f)(target.mapCoordsToPixel(m_centerCoordinate, m_cartesianPlane));
@@ -186,7 +189,7 @@ void Particle::draw(RenderTarget& target, RenderStates states) const
 	// Cartesian to pixel / monitor coordinates using mapCoordsToPixel
 
 	lines[0].position = center; // may be the other way around ???
-	lines[0].color = m_color1;
+	lines[0].color = m_color1;	//assign m_color to the center of particle
 
 	for (int j = 1; j <= m_numPoints; j++)
 	{
@@ -201,30 +204,31 @@ void Particle::draw(RenderTarget& target, RenderStates states) const
 		lines[j].color = m_color2;
 	}
 
-	target.draw(lines);
+	target.draw(lines);  //draw the VertexArray 
 }
 
 void Particle::update(float dt)
 {
-	m_ttl -= dt;
-	rotate(dt * m_radiansPerSec);
-	scale(SCALE);
+	m_ttl -= dt; //Subtract dt from m_ttl
+	rotate(dt * m_radiansPerSec); //Call rotate with said angle
+	scale(SCALE);				//call scale with constant
 
+	//calculations to call translate()
 	float dx = m_vx * dt;
 	float dy;
 
-	m_vy -= G * dt;
+	m_vy -= G * dt; //subtract using gravity constant
 	dy = m_vy * dt;
 
-	translate(dx, dy);
+	translate(dx, dy);  //Call translate using dx,dy
 }
 
 
 void Particle::translate(double xShift, double yShift)
 {
-	TranslationMatrix T(xShift, yShift, m_A.getCols());
-	m_A = T + m_A;
-	m_centerCoordinate.x += xShift;
+	TranslationMatrix T(xShift, yShift, m_A.getCols());  //make a TranslationMatrix with the specified shift values
+	m_A = T + m_A;		//add it to matrix
+	m_centerCoordinate.x += xShift;		//Update the particle's center coordinate 
 	m_centerCoordinate.y += yShift;
 }
 
@@ -233,16 +237,16 @@ void Particle::rotate(double theta)
 {
 	Vector2f temp = m_centerCoordinate;		// Store the value of m_centerCoordinate in a Vector2f temp
 	translate(-m_centerCoordinate.x, -m_centerCoordinate.y);	//This will shift our particle's center, wherever it is, back to the origin
-	RotationMatrix R(theta);
-	m_A = R * m_A;
-	translate(temp.x, temp.y);
+	RotationMatrix R(theta); 	//make a RotationMatrix with angle "theta"
+	m_A = R * m_A;				//multiply it to apply the effect
+	translate(temp.x, temp.y);	//bring particle back to its original center
 }
 
 void Particle::scale(double c)
 {
 	Vector2f temp = m_centerCoordinate;		// Store the value of m_centerCoordinate in a Vector2f temp
 	translate(-m_centerCoordinate.x, -m_centerCoordinate.y);	//This will shift our particle's center, wherever it is, back to the origin
-	ScalingMatrix S(c);
-	m_A = S * m_A;
-	translate(temp.x, temp.y);
+	ScalingMatrix S(c);			//make a ScalingMatrix with a factor of "c"
+	m_A = S * m_A;				//multiply it
+	translate(temp.x, temp.y);	//bring particle back to its original center
 }

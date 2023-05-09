@@ -2,26 +2,28 @@
 
 Engine::Engine()
 {
+	//set size of window with respect to the computer width and height and make the window
 	m_Window.create(VideoMode::getDesktopMode(), "Particles", Style::Default);
-	srand(time(0));
+	srand(time(0)); //may not need this
 }
 
 
 void Engine::run()
 {
-	// Timing 	
-	Clock clock;
+	Clock clock; //Construct a local Clock object to track time per frame
 
+	//unit tests
 	cout << "Starting Particle unit tests..." << endl;
 	Particle p(m_Window, 4, { (int)m_Window.getSize().x / 2, (int)m_Window.getSize().y / 2 });
 	p.unitTests();
 	cout << "Unit tests complete.  Starting engine..." << endl;
 
+	//while m_Window is open...
 	while (m_Window.isOpen())
 	{
-		Time dt = clock.restart();
+		Time dt = clock.restart(); //restart clock
 
-		float dtAsSeconds = dt.asSeconds();
+		float dtAsSeconds = dt.asSeconds(); //convert to seconds
 		input();             //handle user input
 		update(dtAsSeconds); // Call update to update the game state using elapsed time
 		draw();             // draw everything to render game
@@ -49,7 +51,7 @@ void Engine::input()
 
 				//Pass the position of the mouse click into the constructor
 				Particle particle(m_Window, numPoints, Mouse::getPosition());
-        			m_particles.push_back(particle);
+        		m_particles.push_back(particle);  //push each particle into vector
 			}
 		}
 	}
@@ -77,6 +79,7 @@ void Engine::update(float dtAsSeconds)
 void Engine::draw()
 {
 	m_Window.clear();
+	//Loop through each Particle in m_Particles and draw
 	for (Particle parti : m_particles)
 	{
 		m_Window.draw(parti);
@@ -87,6 +90,6 @@ void Engine::draw()
 		m_Window.draw(m_particles[i]);
 	}
 	*/
-	m_Window.display();
+	m_Window.display(); //display everything created
 
 }

@@ -1,0 +1,9 @@
+make --dry-run --always-make --keep-going --print-directory
+make: Entering directory '/home/admin/Desktop/cisp400/Particles_CISP400'
+g++ -g -Wall -fpermissive -std=c++17  -c -o Matrices.o Matrices.cpp
+g++ -g -Wall -fpermissive -std=c++17  -c -o Engine.o Engine.cpp
+g++ -g -Wall -fpermissive -std=c++17  -c -o Particles.o Particles.cpp
+g++ -g -Wall -fpermissive -std=c++17  -c -o main.o main.cpp
+g++ -o game.out Matrices.o Engine.o Particles.o main.o -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
+make: Leaving directory '/home/admin/Desktop/cisp400/Particles_CISP400'
+ 
